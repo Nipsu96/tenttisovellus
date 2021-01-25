@@ -12,7 +12,7 @@ module.exports = app
 const httpServer = require('http').createServer()
 const io = require('socket.io')(httpServer, {
   cors: {
-    origin: "https://tenttisovellus-niko.herokuapp.com/",
+    origin: "https://tenttisovellus-niko.herokuapp.com",
     methods: ["GET", "POST"]
   }
 })
