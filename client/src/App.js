@@ -12,7 +12,22 @@ import Register from './components/Register';
 import axios from 'axios';
 import { FormattedMessage } from 'react-intl';
 
+var path = null
 
+switch(process.env.NODE_ENV){
+  case 'production':
+    path= 'https://tenttisovellus-niko.herokuapp.com/'
+    break;
+  case 'developement':
+    path= 'http://localhost:3005/'
+    break;
+  case 'test':
+    path='http://localhost:3005/'
+    break;
+  default:
+    throw " Enviroment not properly set!"  
+  
+}
 
 function reducer(state, action) {
   let syvakopio = JSON.parse(JSON.stringify(state))
@@ -79,7 +94,7 @@ function App(props) {
     const createData = async () => {
 
       try {
-        let result = await axios.get("http://localhost:3005/tentit")
+        let result = await axios.get(path+"tentit")
         dispatch({ type: "INIT_DATA", data: result.data })
         setDataAlustettu(true)
       } catch (exception) {
@@ -89,18 +104,18 @@ function App(props) {
 
     const fetchData = async () => {
       try {
-        let result = await axios.get("http://localhost:3005/tentit")
+        let result = await axios.get(path+"tentit")
 
         if (result.data.length > 0) {
           for (var i = 0; i < result.data.length; i++) {
             result.data[i].kyselyt = []
-            let kysymykset = await axios.get("http://localhost:3005/kysymykset/" + result.data[i].tentti_id)
+            let kysymykset = await axios.get(path+"kysymykset/" + result.data[i].tentti_id)
             result.data[i].kysymykset = kysymykset.data
 
             if (result.data[i].kysymykset.length > 0) {
               for (var j = 0; j < result.data[i].kysymykset.length; j++) {
                 result.data[i].kysymykset[j].vaihtoehdot = []
-                let vaihtoehdot = await axios.get("http://localhost:3005/vastausvaihtoehdot/" + result.data[i].kysymykset[j].kysymys_id)
+                let vaihtoehdot = await axios.get(path+"vastausvaihtoehdot/" + result.data[i].kysymykset[j].kysymys_id)
                 result.data[i].kysymykset[j].vaihtoehdot = vaihtoehdot.data
               }
             }
@@ -121,7 +136,7 @@ function App(props) {
 
     // const updateData = async () => {
     //   try {
-    //     let result = await axios.put("http://localhost:3005/users", state)
+    //     let result = await axios.put(path+"/users", state)
     //   } catch (exception) {
     //     console.log("Datan päivitys ei onnistunut")
     //   }
