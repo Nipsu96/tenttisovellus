@@ -12,7 +12,7 @@ module.exports = app
 const httpServer = require('http').createServer()
 const io = require('socket.io')(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3005",
     methods: ["GET", "POST"]
   }
 })
@@ -20,7 +20,7 @@ var port = process.env.PORT || 3005
 app.use(bodyParser.json())
 //https://expressjs.com/en/resources/middleware/cors.html
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'http://localhost:3005',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }))
 app.use(fileUpload({
@@ -57,7 +57,8 @@ io.on('connection', function (socket) {
   });
 });
 
-app.use(express.static('.client/build'))
+app.use(express.static('./client/build'))
+
 // app.get('/tentit/:id', (req, res, next) => {
 
 //   db.query('SELECT * FROM tentti_taulu WHERE tentti_id = $1', [req.params.id], (err, result) => {
