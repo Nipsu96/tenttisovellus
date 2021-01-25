@@ -12,17 +12,18 @@ module.exports = app
 const httpServer = require('http').createServer()
 const io = require('socket.io')(httpServer, {
   cors: {
-    origin: "http://localhost:3005",
+    origin: "https://tenttisovellus-niko.herokuapp.com:9000",
     methods: ["GET", "POST"]
   }
 })
+
+if (process.env.HEROKU == true){
+
+} 
 var port = process.env.PORT || 3005
 app.use(bodyParser.json())
 //https://expressjs.com/en/resources/middleware/cors.html
-app.use(cors({
-  origin: 'http://localhost:3005',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}))
+app.use(cors())
 app.use(fileUpload({
   limits: { fileSize: 2 * 1024 * 1024 * 1024 },
 }));
