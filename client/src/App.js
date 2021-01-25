@@ -18,7 +18,7 @@ switch(process.env.NODE_ENV){
   case 'production':
     path= 'https://tenttisovellus-niko.herokuapp.com/'
     break;
-  case 'developement':
+  case 'development':
     path= 'http://localhost:3005/'
     break;
   case 'test':
