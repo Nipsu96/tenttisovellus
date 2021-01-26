@@ -4,10 +4,10 @@ var connectInfo = {}
 
 if (process.env.HEROKU){
   connectInfo= {
-    user: 'postgres',
-    host: 'localhost',
-    database: 'TenttiKanta',
-    password: 'Fullstack2020_NikoL',
+    user: 'dlcuciftcpzips',
+    host: 'ec2-54-75-225-52.eu-west-1.compute.amazonaws.com',
+    database: 'dc8v3e46ejoirp',
+    password: '4b4b49650249e4eb8e792e52c4f01146d525205945d1316061673554cf540b2a',
     port: 5432,
   }
 }else{
