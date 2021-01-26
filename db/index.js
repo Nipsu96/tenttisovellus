@@ -12,8 +12,10 @@ if (process.env.HEROKU){
     database: 'TenttiKanta',
     password: 'Fullstack2020_NikoL',
     port: 5432,
-}}
+}
 pool = new Pool(connectInfo)
+}
+
 
 //  connectInfo= {
   // user: 'dlcuciftcpzips',
@@ -22,7 +24,7 @@ pool = new Pool(connectInfo)
   // password: '4b4b49650249e4eb8e792e52c4f01146d525205945d1316061673554cf540b2a',
   // port: 5432,
 
-  
+
 // const pool = new Pool({
 //     user: 'postgres',
 //     host: 'localhost',
