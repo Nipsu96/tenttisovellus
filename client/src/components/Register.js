@@ -35,7 +35,7 @@ function Register(props) {
 
     return <div className="main">
         <div className="register">
-            <h2>Rekisteröidy</h2>
+            <h2 className="register_title">Rekisteröidy</h2>
             <form onSubmit={e => doSubmit(e)}>
                 <label htmlFor="fname">Etunimi: </label>
                 <input type="text" id="fname" name="etunimi" placeholder="Etunimi" value={userData.etunimi} onChange={onChange}></input><br />

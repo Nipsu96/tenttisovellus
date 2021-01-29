@@ -11,22 +11,24 @@ import ChangeTests from './components/Modify';
 import Register from './components/Register';
 import axios from 'axios';
 import { FormattedMessage } from 'react-intl';
+import MenuIcon from '@material-ui/icons/Menu';
+import CloseIcon from '@material-ui/icons/Close';
 
 var path = null
 
-switch(process.env.NODE_ENV){
+switch (process.env.NODE_ENV) {
   case 'production':
-    path= 'https://tenttisovellus-niko.herokuapp.com/'
+    path = 'https://tenttisovellus-niko.herokuapp.com/'
     break;
   case 'development':
-    path= 'http://localhost:3005/'
+    path = 'http://localhost:3005/'
     break;
   case 'test':
-    path='http://localhost:3005/'
+    path = 'http://localhost:3005/'
     break;
   default:
-    throw " Enviroment not properly set!"  
-  
+    throw " Enviroment not properly set!"
+
 }
 
 function reducer(state, action) {
@@ -39,7 +41,7 @@ function reducer(state, action) {
       syvakopio[action.data.tenttiindex].kysymykset[action.data.kysymysindex].vaihtoehdot[action.data.vaihtoehtoindex].oikea_vastaus = action.data.newRightAnswer;
       return syvakopio
     case 'VASTAUS_MUUTTUI':
-      console.log("Ollaan vastaus muuttui",action.data.newAnswer )
+      console.log("Ollaan vastaus muuttui", action.data.newAnswer)
       syvakopio[action.data.tenttiindex].kysymykset[action.data.kysymysindex].vaihtoehdot[action.data.vaihtoehtoindex].vastaus_nimi = action.data.newAnswer
       return syvakopio
     case 'KYSYMYS_MUUTTUI':
@@ -89,12 +91,13 @@ function App(props) {
   const [dataAlustettu, setDataAlustettu] = useState(false)
   const [state, dispatch] = useReducer(reducer, []);
 
+
   useEffect(() => {
 
     const createData = async () => {
 
       try {
-        let result = await axios.get(path+"tentit")
+        let result = await axios.get(path + "tentit")
         dispatch({ type: "INIT_DATA", data: result.data })
         setDataAlustettu(true)
       } catch (exception) {
@@ -104,18 +107,18 @@ function App(props) {
 
     const fetchData = async () => {
       try {
-        let result = await axios.get(path+"tentit")
+        let result = await axios.get(path + "tentit")
 
         if (result.data.length > 0) {
           for (var i = 0; i < result.data.length; i++) {
             result.data[i].kyselyt = []
-            let kysymykset = await axios.get(path+"kysymykset/" + result.data[i].tentti_id)
+            let kysymykset = await axios.get(path + "kysymykset/" + result.data[i].tentti_id)
             result.data[i].kysymykset = kysymykset.data
 
             if (result.data[i].kysymykset.length > 0) {
               for (var j = 0; j < result.data[i].kysymykset.length; j++) {
                 result.data[i].kysymykset[j].vaihtoehdot = []
-                let vaihtoehdot = await axios.get(path+"vastausvaihtoehdot/" + result.data[i].kysymykset[j].kysymys_id)
+                let vaihtoehdot = await axios.get(path + "vastausvaihtoehdot/" + result.data[i].kysymykset[j].kysymys_id)
                 result.data[i].kysymykset[j].vaihtoehdot = vaihtoehdot.data
               }
             }
@@ -148,22 +151,42 @@ function App(props) {
     //   updateData();
     // }
   }, [state])
+  const [click, setClick] = useState(false);
+  const handleClick = () => setClick(!click);
+  const closeMobileMenu = () => setClick(false);
+
   return (
     <Router>
       <div className="App">
         <header className="App-header">
-          <ul>
-            <li><Link to="/tests" className="active" ><FormattedMessage id="tests" /></Link></li>
-            <li><Link to="/about"><FormattedMessage id="about"
+          <ul className={click ? "nav-options active" : "nav-options"}>
+            <li onClick={closeMobileMenu}><Link to="/tests" className="active" ><FormattedMessage id="tests" /></Link></li>
+            <li onClick={closeMobileMenu} ><Link to="/about"><FormattedMessage id="about"
             /></Link></li>
-            <li><Link to="/admin"><FormattedMessage id="modify"
+            <li onClick={closeMobileMenu}><Link to="/admin"><FormattedMessage id="modify"
             /></Link></li>
-            <li><Link to="/register"><FormattedMessage id="register"
+            <li onClick={closeMobileMenu}><Link to="/register"><FormattedMessage id="register"
             /></Link></li>
-            <li><Link to="/login"><FormattedMessage id="login"
+            <li onClick={closeMobileMenu}><Link to="/login"><FormattedMessage id="login"
             /></Link></li>
-            <li><FormattedMessage id="Language" /></li>
           </ul>
+          <div className="mobile-menu" onClick={handleClick}>
+            {click ? (
+              <CloseIcon style=
+                {{
+                  color: "white",
+                  fontSize: 29,
+                  
+                }}
+                className="menu-icon" />
+            ) : (
+                <MenuIcon style={{
+                  color: "white",
+                  fontSize: 29,
+                }} 
+                className="menu-icon" />
+              )}
+          </div>
         </header>
         <Switch>
           <Route path="/tests">
@@ -175,7 +198,7 @@ function App(props) {
           <Route path="/register">
             {state.length > 0 ? <Register /> : "Tietoa haetaan"}
           </Route>
-          
+
         </Switch>
       </div></Router>
   );

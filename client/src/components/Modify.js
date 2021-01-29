@@ -113,7 +113,7 @@ function ChangeTests(props) {
   }
 
   return <div>
-    <h2>Tervetuloa admin</h2>
+    <h2 className="modify_title">Tervetuloa admin</h2>
     <div className="main">
       {props.data.map((tentti, index) => <button className="TenttiButton" key={index} onClick={() => vaihdaTentti(index)}>{tentti.tentin_nimi}</button>)}
 

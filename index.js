@@ -10,6 +10,10 @@ const db = require('./db')
 const fileUpload = require('express-fileupload')
 module.exports = app
 const httpServer = require('http').createServer()
+
+// http://localhost:3005
+//https://tenttisovellus-niko.herokuapp.com
+
 const io = require('socket.io')(httpServer, {
   cors: {
     origin: "https://tenttisovellus-niko.herokuapp.com",
