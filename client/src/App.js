@@ -175,6 +175,7 @@ function App(props) {
           <Route path="/register">
             {state.length > 0 ? <Register /> : "Tietoa haetaan"}
           </Route>
+          
         </Switch>
       </div></Router>
   );
