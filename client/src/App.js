@@ -22,10 +22,12 @@ switch (process.env.NODE_ENV) {
   case 'production':
     path = 'https://tenttisovellus-niko.herokuapp.com/'
     endpoint = 'https://tenttisovellus-niko.herokuapp.com'
+    console.log("Heroku",path)
     break;
   case 'development':
     path = 'http://localhost:3005/'
     endpoint= 'http://localhost:3005'
+    console.log("Localhost:",path)
     break;
   case 'test':
     path = 'http://localhost:3005/'
@@ -34,7 +36,6 @@ switch (process.env.NODE_ENV) {
     throw " Enviroment not properly set!"
 
 }
-
 function reducer(state, action) {
   let syvakopio = JSON.parse(JSON.stringify(state))
   switch (action.type) {

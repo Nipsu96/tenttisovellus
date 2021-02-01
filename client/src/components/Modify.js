@@ -13,11 +13,11 @@ switch(process.env.NODE_ENV){
   case 'production':
     path= 'https://tenttisovellus-niko.herokuapp.com/'
     break;
-  case 'developement':
-    path= 'http://localhost:3000/'
+  case 'development':
+    path= 'http://localhost:3005/'
     break;
   case 'test':
-    path='http://localhost:3000/'
+    path='http://localhost:3005/'
     break;
   default:
     throw " Enviroment not properly set!"  

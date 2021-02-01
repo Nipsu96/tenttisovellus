@@ -24,12 +24,12 @@ var appOrigin = null
 var con_string = null
 if (!process.env.HEROKU){
   con_string= 'tcp://postgres:Fullstack2020_NikoL@localhost:5432/TenttiKanta';
-  appOrigin= 'http://localhost:3005'
-  console.log("front:",appOrigin)
+  appOrigin= 'http://localhost:3000'
+  console.log("frontiiiiiii:",appOrigin)
 } else{
   con_string= process.env.DATABASE_URL;
-  appOrigin= 'https://tenttisovellus-niko.herokuapp.com'
-  console.log("front:",appOrigin)
+  appOrigin= 'https://tenttisovellus-niko.herokuapp.com/'
+  console.log("frontHEroke:",appOrigin)
 }
 
 var corsOptions ={
@@ -38,6 +38,7 @@ var corsOptions ={
   methods:"GET,PUT,POST,DELETE"
 }
 app.use(cors(corsOptions))
+console.log(corsOptions)
 app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io'))
 
 var io = require('socket.io')(httpServer, {
