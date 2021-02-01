@@ -13,15 +13,19 @@ import axios from 'axios';
 import { FormattedMessage } from 'react-intl';
 import MenuIcon from '@material-ui/icons/Menu';
 import CloseIcon from '@material-ui/icons/Close';
+import socketIOClient from 'socket.io-client';
 
 var path = null
+var endpoint = null
 
 switch (process.env.NODE_ENV) {
   case 'production':
     path = 'https://tenttisovellus-niko.herokuapp.com/'
+    endpoint = 'https://tenttisovellus-niko.herokuapp.com'
     break;
   case 'development':
     path = 'http://localhost:3005/'
+    endpoint= 'http://localhost:3005'
     break;
   case 'test':
     path = 'http://localhost:3005/'
@@ -91,6 +95,19 @@ function App(props) {
   const [dataAlustettu, setDataAlustettu] = useState(false)
   const [state, dispatch] = useReducer(reducer, []);
 
+  useEffect(()=>{
+    const socket = socketIOClient(endpoint);
+
+    socket.on('connected', function (data) {
+      console.log("Socket.io: Connected")
+      socket.emit('ready for data', {});
+    });
+    socket.on('update', function (data) {
+      console.log("Tietokanta päivitetty!",data.message.payload);
+      window.alert("Tietokantaa muokattu!")
+    });
+    return ()=> socket.disconnect();
+  },[endpoint])
 
   useEffect(() => {
 

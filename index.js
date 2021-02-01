@@ -9,41 +9,63 @@ var bodyParser = require("body-parser")
 const db = require('./db')
 const fileUpload = require('express-fileupload')
 module.exports = app
-const httpServer = require('http').createServer()
+const httpServer = require('http').createServer(app)
+var port = process.env.PORT || 3005
+
+app.use(bodyParser.json())
+app.use(express.static('./client/build'))
 
 // http://localhost:3005
 //https://tenttisovellus-niko.herokuapp.com
 
-const io = require('socket.io')(httpServer, {
+
+
+var appOrigin = null
+var con_string = null
+if (!process.env.HEROKU){
+  con_string= 'tcp://postgres:Fullstack2020_NikoL@localhost:5432/TenttiKanta';
+  appOrigin= 'http://localhost:3005'
+  console.log("front:",appOrigin)
+} else{
+  con_string= process.env.DATABASE_URL;
+  appOrigin= 'https://tenttisovellus-niko.herokuapp.com'
+  console.log("front:",appOrigin)
+}
+
+var corsOptions ={
+  origin:appOrigin,
+  optionSuccessStatus:200,
+  methods:"GET,PUT,POST,DELETE"
+}
+app.use(cors(corsOptions))
+app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io'))
+
+var io = require('socket.io')(httpServer, {
   cors: {
-    origin: "https://tenttisovellus-niko.herokuapp.com",
+    origin: appOrigin,
     methods: ["GET", "POST"]
   }
 })
 
-if (process.env.HEROKU == true){
-
-} 
-var port = process.env.PORT || 3005
-app.use(bodyParser.json())
 //https://expressjs.com/en/resources/middleware/cors.html
-app.use(cors())
+
+
 app.use(fileUpload({
   limits: { fileSize: 2 * 1024 * 1024 * 1024 },
 }));
-app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io')) //static socket.io
+ //static socket.io
 
-app.use('/paljonkelloon', function (req, res, next) {
-  console.log('Kello on :', Date.now())
-  next()
-})
+// app.use('/paljonkelloon', function (req, res, next) {
+//   console.log('Kello on :', Date.now())
+//   next()
+// })
 
-httpServer.listen(9000)
+// httpServer.listen(9000)
 
 // var io = require('socket.io')(5432);
 var pg = require('pg');
 
-var con_string = 'tcp://postgres:Fullstack2020_NikoL@localhost:5432/TenttiKanta';
+// var con_string = 'tcp://postgres:Fullstack2020_NikoL@localhost:5432/TenttiKanta';
 
 var pg_client = new pg.Client(con_string);
 pg_client.connect();
@@ -55,14 +77,14 @@ pg_client.on('notification', async (data) => {
 io.on('connection', function (socket) {
   socket.emit('connected', { connected: true });
 
-  socket.on('ready for data', function (data) {
-    pg_client.on('notification', function (title) {
-      socket.emit('update', { message: title })
+  socket.on('ready for data',(data) =>{
+    pg_client.on('notification', (payload) =>{
+      socket.emit('update', { message: payload})
     });
   });
 });
 
-app.use(express.static('./client/build'))
+
 
 // app.get('/tentit/:id', (req, res, next) => {
 
@@ -389,6 +411,6 @@ app.get('*',(req,res)=>{
   res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
 
-app.listen(process.env.PORT || 3005,() => {
+httpServer.listen(port,() => {
   console.log(`Example app listening at http://localhost:${port}`)
 })

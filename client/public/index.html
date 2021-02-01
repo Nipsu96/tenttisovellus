@@ -33,18 +33,7 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-      <script type="text/JavaScript" src="https://tenttisovellus-niko.herokuapp.com/socket.io/client-dist/socket.io.js"></script>
-  <script>
-    var socket = io.connect('http://localhost:9000');
-    socket.on('connected', function (data) {
-      console.log("Socket.io: Connected")
-      socket.emit('ready for data', {});
-    });
-    socket.on('update', function (data) {
-      console.log("Tietokanta päivitetty!",data.message.payload);
-      window.alert("Tietokantaa muokattu!")
-    });
-  </script>
+     
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
