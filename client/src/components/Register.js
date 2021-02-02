@@ -44,7 +44,7 @@ function Register(props) {
          } */
         try {
             await axios.post(path+"users", userData)
-            console.log("Onnistui!")
+            console.log("Onnistui!",userData)
         } catch (e) {
             console.log("registration error",e)
         }
