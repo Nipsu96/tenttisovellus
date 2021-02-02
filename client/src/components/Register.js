@@ -2,22 +2,7 @@ import React, { useState } from 'react';
 import '../App.css';
 import axios from 'axios';
 
-var path = null
 
-switch(process.env.NODE_ENV){
-  case 'production':
-    path= 'https://tenttisovellus-niko.herokuapp.com/'
-    break;
-  case 'development':
-    path= 'http://localhost:3005/'
-    break;
-  case 'test':
-    path='http://localhost:3005/'
-    break;
-  default:
-    throw " Enviroment not properly set!"  
-  
-}
 
 function Register(props) {
     const [userData, setUserData] = useState({
@@ -43,8 +28,8 @@ function Register(props) {
              password: password
          } */
         try {
-            await axios.post(path+"users", userData)
-            console.log("Onnistui!",userData)
+            await axios.post(props.path+"users", userData)
+            console.log("Rekisteröinti Onnistui!")
         } catch (e) {
             console.log("registration error",e)
         }

@@ -208,13 +208,13 @@ function App(props) {
         </header>
         <Switch>
           <Route path="/tests">
-            {state.length > 0 ? <Tentit data={state} dispatch={dispatch} /> : "Tietoa haetaan"}
+            {state.length > 0 ? <Tentit path ={path} data={state} dispatch={dispatch} /> : "Tietoa haetaan"}
           </Route>
           <Route path="/admin">
-            {state.length > 0 ? <ChangeTests data={state} dispatch={dispatch} /> : "Tietoa haetaan"}
+            {state.length > 0 ? <ChangeTests path ={path} data={state} dispatch={dispatch} /> : "Tietoa haetaan"}
           </Route>
           <Route path="/register">
-            {state.length > 0 ? <Register /> : "Tietoa haetaan"}
+            {state.length > 0 ? <Register path ={path} /> : "Tietoa haetaan"}
           </Route>
 
         </Switch>

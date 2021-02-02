@@ -25,11 +25,10 @@ var con_string = null
 if (!process.env.HEROKU){
   con_string= 'tcp://postgres:Fullstack2020_NikoL@localhost:5432/TenttiKanta';
   appOrigin= 'http://localhost:3000'
-  console.log("frontiiiiiii:",appOrigin)
 } else{
   con_string= process.env.DATABASE_URL;
   appOrigin= 'https://tenttisovellus-niko.herokuapp.com/'
-  console.log("frontHEroke:",appOrigin)
+
 }
 
 var corsOptions ={
@@ -38,7 +37,6 @@ var corsOptions ={
   methods:"GET,PUT,POST,DELETE"
 }
 app.use(cors(corsOptions))
-console.log(corsOptions)
 app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io'))
 
 var io = require('socket.io')(httpServer, {
@@ -359,7 +357,7 @@ app.post('/users', (req, res) => {
   // }))
   // if (invalid) return res.json({ error: "Values missing" })  
 
-  console.log("Nyt rekisteröidytään", userData)
+  // console.log("Nyt rekisteröidytään", userData)
   db.query('select * FROM users where email=$1', [userData.email], (err, result) => {
     if (err) {
       return res.json("Nyt on errori")
@@ -405,7 +403,7 @@ app.post('/upload', function (req, res) {
       return res.status(500).send(err)
     }
   });
-  console.log("hereweare")
+  // console.log("hereweare")
 });
 
 app.get('*',(req,res)=>{

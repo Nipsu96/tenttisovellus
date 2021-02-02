@@ -7,22 +7,6 @@ import { TextField } from '@material-ui/core';
 import { useDropzone } from 'react-dropzone'
 const request = require('superagent');
 
-var path = null
-
-switch(process.env.NODE_ENV){
-  case 'production':
-    path= 'https://tenttisovellus-niko.herokuapp.com/'
-    break;
-  case 'development':
-    path= 'http://localhost:3005/'
-    break;
-  case 'test':
-    path='http://localhost:3005/'
-    break;
-  default:
-    throw " Enviroment not properly set!"  
-  
-}
 
 function ChangeTests(props) {
 
@@ -30,7 +14,7 @@ function ChangeTests(props) {
 
     console.log("Tämä on file:", files);
 
-    const req = request.post(path+'upload');
+    const req = request.post(props.path+'upload');
     console.log(" Tämä on Req", req)
 
     files.forEach(file => {
@@ -60,7 +44,7 @@ function ChangeTests(props) {
     e.preventDefault()
     let uusikysymys = kysymysData
     console.log("Uusikysymys", uusikysymys)
-    await axios.post(path+"kysymykset", {
+    await axios.post(props.path+"kysymykset", {
       kysymys_nimi: uusikysymys.kysymys_nimi, tentti_id: tentti_id.toString()
       //req.body.kysymys_nimi,req.body.tentti_id,
     })
@@ -76,7 +60,7 @@ function ChangeTests(props) {
     e.preventDefault()
     let uusivaihtoehto = userData
     console.log("Uusivaihtoehto", uusivaihtoehto)
-    await axios.post(path+"vastausvaihtoehdot", {
+    await axios.post(props.path+"vastausvaihtoehdot", {
       vastaus_nimi: uusivaihtoehto.vastaus_nimi,
       oikea_vastaus: uusivaihtoehto.oikea_vastaus, kysymys_id: kysymys_id.toString()
     })
@@ -86,29 +70,29 @@ function ChangeTests(props) {
   // axios put
   const kysymysMuuttui = async (e, kysymys_id, kysymysindex, aktiivinenTentti) => {
     let uusikysymys = e.target.value
-    await axios.put(path+"kysymykset", { kysymys_nimi: e.target.value, kysymys_id: kysymys_id.toString() })
+    await axios.put(props.path+"kysymykset", { kysymys_nimi: e.target.value, kysymys_id: kysymys_id.toString() })
     props.dispatch({ type: "KYSYMYS_MUUTTUI", data: { newQuestion: uusikysymys, tenttiindex: aktiivinenTentti, kysymysindex: kysymysindex } })
   }
   //e, alkio.vaihtoehto_id, alkio.kysymys_id, kysymysindex, aktiivinenTentti, vaihtoehtoindex
   const vastausVaihtoehtoMuuttui = async (e, vaihtoehto_id, kysymysindex, aktiivinenTentti, vaihtoehtoindex) => {
     let uusivaihtoehto = e.target.value
-    await axios.put(path+"vastausvaihtoehdot", { vastaus_nimi: e.target.value, vaihtoehto_id: vaihtoehto_id.toString() })
+    await axios.put(props.path+"vastausvaihtoehdot", { vastaus_nimi: e.target.value, vaihtoehto_id: vaihtoehto_id.toString() })
     props.dispatch({ type: "VASTAUS_MUUTTUI", data: { newAnswer: uusivaihtoehto, tenttiindex: aktiivinenTentti, kysymysindex: kysymysindex, vaihtoehtoindex: vaihtoehtoindex } })
   }
   const oikeaVastausMuuttui = async (e, vaihtoehto_id, kysymysindex, aktiivinenTentti, vaihtoehtoindex) => {
     let uusiOikeaVastaus = e.target.checked
-    await axios.put(path+"vastausvaihtoehdot/oikea", { vaihtoehto_id: vaihtoehto_id.toString(), oikea_vastaus: e.target.checked })
+    await axios.put(props.path+"vastausvaihtoehdot/oikea", { vaihtoehto_id: vaihtoehto_id.toString(), oikea_vastaus: e.target.checked })
     props.dispatch({ type: "OIKEA_VASTAUS", data: { newRightAnswer: uusiOikeaVastaus, tenttiindex: aktiivinenTentti, kysymysindex: kysymysindex, vaihtoehtoindex: vaihtoehtoindex } })
   }
 
   // axios delete
 
   const poistaVastaus = async (e, vaihtoehto_id, kysymys_id, kysymysindex, aktiivinenTentti, vaihtoehtoindex) => {
-    await axios.delete(path+"vastausvaihtoehdot", { data: { kysymys_id: kysymys_id.toString(), vaihtoehto_id: vaihtoehto_id.toString() } })
+    await axios.delete(props.path+"vastausvaihtoehdot", { data: { kysymys_id: kysymys_id.toString(), vaihtoehto_id: vaihtoehto_id.toString() } })
     props.dispatch({ type: "POISTA_VASTAUS", data: { tenttiindex: aktiivinenTentti, kysymysindex: kysymysindex, vaihtoehtoindex: vaihtoehtoindex } })
   }
   const poistaKysymys = async (e, kysymys_id, kysymysindex, aktiivinenTentti,) => {
-    await axios.delete(path+"kysymykset", { data: { kysymys_id: kysymys_id.toString() } })
+    await axios.delete(props.path+"kysymykset", { data: { kysymys_id: kysymys_id.toString() } })
     props.dispatch({ type: "POISTA_KYSYMYS", data: { tenttiindex: aktiivinenTentti, kysymysindex: kysymysindex } })
   }
 

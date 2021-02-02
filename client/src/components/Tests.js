@@ -22,11 +22,11 @@ function Tentit(props)
   {props.data.map((tentti,index)=><button className="TenttiButton"key={index} onClick={()=>vaihdaTentti(index)}>{tentti.tentin_nimi}</button>)}
   <div className="askCards">
   {palautus === false ? props.data[aktiivinenTentti].kysymykset.map((item, index) => <div key={index} className="Card"><div className="Kysymys" >{item.kysymys_nimi}</div>
-      {item.vaihtoehdot && <AskCard index={index} tenttiindex={aktiivinenTentti} kysymys_id={item.kysymys_id}vaihtoehdot={item.vaihtoehdot} dispatch={props.dispatch}></AskCard> }
+      {item.vaihtoehdot && <AskCard path ={props.path}index={index} tenttiindex={aktiivinenTentti} kysymys_id={item.kysymys_id}vaihtoehdot={item.vaihtoehdot} dispatch={props.dispatch}></AskCard> }
     </div>)
       :
-      props.data[aktiivinenTentti].kysymykset.map((item, index) => <div key={index} className="Card"><div className="Kysymys" >{item.kysymys}</div>
-        {item.vaihtoehdot &&<ShowAnswers index={index} valittu={props.data.valittu}vaihtoehdot={item.vaihtoehdot} dispatch={props.dispatch}></ShowAnswers>}
+      props.data[aktiivinenTentti].kysymykset.map((item, index) => <div key={index} className="Card"><div className="Kysymys" >{item.kysymys_nimi}</div>
+        {item.vaihtoehdot &&<ShowAnswers path ={props.path} index={index} valittu={props.data.valittu}vaihtoehdot={item.vaihtoehdot} dispatch={props.dispatch}></ShowAnswers>}
       </div>)}
     <button className="showbutton" onClick={(index)=>{naytaVastaukset(index,aktiivinenTentti)}}>Näytä Vastaukset</button>
   </div>
