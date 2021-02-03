@@ -14,6 +14,7 @@ import { FormattedMessage } from 'react-intl';
 import MenuIcon from '@material-ui/icons/Menu';
 import CloseIcon from '@material-ui/icons/Close';
 import socketIOClient from 'socket.io-client';
+import Login from './components/Login';
 
 var path = null
 var endpoint = null
@@ -215,6 +216,9 @@ function App(props) {
           </Route>
           <Route path="/register">
             {state.length > 0 ? <Register path ={path} /> : "Tietoa haetaan"}
+          </Route>
+          <Route path="/login">
+            {state.length > 0 ? <Login path ={path} /> : "Tietoa haetaan"}
           </Route>
 
         </Switch>

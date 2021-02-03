@@ -4,13 +4,14 @@ const SALT_ROUNDS=5
 let alkuhetki = Date.now()
 let loppuhetki
 let hashattuSalasana
+
 bcrypt.hash("Kissa", SALT_ROUNDS,(err,hash)=>{
 
     hashattuSalasana = hash
     loppuhetki =Date.now()
     console.log("Operaatio kesti: ",loppuhetki-alkuhetki)
 
-    bcrypt.compare("kissa",hashattuSalasana,function(err,result){
+    bcrypt.compare("Kissa",hashattuSalasana,function(err,result){
         if (err){
             console.log(err)
         }else {
@@ -23,7 +24,7 @@ bcrypt.hash("Kissa", SALT_ROUNDS,(err,hash)=>{
 // Store hash in your password DB.
 // var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
 // console.log("Alkuperäinen",token)
-// token2=token.substring(0,10)
+// token2=token
 
 // console.log("Sormeiltu",token2)
 

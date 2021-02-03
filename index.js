@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 var jwt = require('jsonwebtoken');
-var path= require('path')
+var path = require('path')
 const SALT_ROUNDS = 5
 var bcrypt = require('bcrypt')
 const cors = require("cors")
@@ -11,30 +11,25 @@ const fileUpload = require('express-fileupload')
 module.exports = app
 const httpServer = require('http').createServer(app)
 var port = process.env.PORT || 3005
+// const passport = require('passport');
 
 app.use(bodyParser.json())
 app.use(express.static('./client/build'))
 
-// http://localhost:3005
-//https://tenttisovellus-niko.herokuapp.com
-
-
-
 var appOrigin = null
 var con_string = null
-if (!process.env.HEROKU){
-  con_string= 'tcp://postgres:Fullstack2020_NikoL@localhost:5432/TenttiKanta';
-  appOrigin= 'http://localhost:3000'
-} else{
-  con_string= process.env.DATABASE_URL;
-  appOrigin= 'https://tenttisovellus-niko.herokuapp.com/'
-
+if (!process.env.HEROKU) {
+  con_string = 'tcp://postgres:Fullstack2020_NikoL@localhost:5432/TenttiKanta';
+  appOrigin = 'http://localhost:3000'
+} else {
+  con_string = process.env.DATABASE_URL;
+  appOrigin = 'https://tenttisovellus-niko.herokuapp.com/'
 }
 
-var corsOptions ={
-  origin:appOrigin,
-  optionSuccessStatus:200,
-  methods:"GET,PUT,POST,DELETE"
+var corsOptions = {
+  origin: appOrigin,
+  optionSuccessStatus: 200,
+  methods: "GET,PUT,POST,DELETE"
 }
 app.use(cors(corsOptions))
 app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io'))
@@ -46,26 +41,13 @@ var io = require('socket.io')(httpServer, {
   }
 })
 
-//https://expressjs.com/en/resources/middleware/cors.html
-
-
 app.use(fileUpload({
   limits: { fileSize: 2 * 1024 * 1024 * 1024 },
 }));
- //static socket.io
 
-// app.use('/paljonkelloon', function (req, res, next) {
-//   console.log('Kello on :', Date.now())
-//   next()
-// })
-
-// httpServer.listen(9000)
-
-// var io = require('socket.io')(5432);
 var pg = require('pg');
 
 // var con_string = 'tcp://postgres:Fullstack2020_NikoL@localhost:5432/TenttiKanta';
-
 var pg_client = new pg.Client(con_string);
 pg_client.connect();
 var query = pg_client.query('LISTEN kysymys_nimi');
@@ -76,49 +58,37 @@ pg_client.on('notification', async (data) => {
 io.on('connection', function (socket) {
   socket.emit('connected', { connected: true });
 
-  socket.on('ready for data',(data) =>{
-    pg_client.on('notification', (payload) =>{
-      socket.emit('update', { message: payload})
+  socket.on('ready for data', (data) => {
+    pg_client.on('notification', (payload) => {
+      socket.emit('update', { message: payload })
     });
   });
 });
 
-
-
-// app.get('/tentit/:id', (req, res, next) => {
-
-//   db.query('SELECT * FROM tentti_taulu WHERE tentti_id = $1', [req.params.id], (err, result) => {
+// keskiarvo SQL-Lauseet
+// app.get('/keskiarvot', (req, res, next) => {
+//   db.query('SELECT keskiarvo.keskiarvo,oppilaat.etunimi,oppilaat.sukunimi FROM keskiarvo INNER JOIN oppilaat ON keskiarvo.oppilas_id = oppilaat.oppilas_id', (err, result) => {
 //     if (err) {
 //       return next(err)
 //     }
-//     res.send(result.rows[0])
+//     res.send(result.rows)
 //   })
 // })
-// // ... many other routes in this file
-// keskiarvo SQL-Lauseet
-app.get('/keskiarvot', (req, res, next) => {
-  db.query('SELECT keskiarvo.keskiarvo,oppilaat.etunimi,oppilaat.sukunimi FROM keskiarvo INNER JOIN oppilaat ON keskiarvo.oppilas_id = oppilaat.oppilas_id', (err, result) => {
-    if (err) {
-      return next(err)
-    }
-    res.send(result.rows)
-  })
-})
-app.put('/tenttitulokset', (req, res, next) => {
-  db.query('SELECT DISTINCT oppilas_id FROM tenttitulokset', (err, result) => {
-    if (err) {
-      return next(err)
-    }
-    for (let x = 0; x < result.rows.length; x++) {
-      db.query('UPDATE public.keskiarvo SET keskiarvo= (SELECT AVG(tulos) FROM tenttitulokset WHERE oppilas_id=$1) WHERE oppilas_id= $1;', [result.rows[x].oppilas_id], (err, result) => {
-        if (err) {
-          return next(err)
-        }
-      })
-    }
-    return res.sendStatus(200)
-  })
-})
+// app.put('/tenttitulokset', (req, res, next) => {
+//   db.query('SELECT DISTINCT oppilas_id FROM tenttitulokset', (err, result) => {
+//     if (err) {
+//       return next(err)
+//     }
+//     for (let x = 0; x < result.rows.length; x++) {
+//       db.query('UPDATE public.keskiarvo SET keskiarvo= (SELECT AVG(tulos) FROM tenttitulokset WHERE oppilas_id=$1) WHERE oppilas_id= $1;', [result.rows[x].oppilas_id], (err, result) => {
+//         if (err) {
+//           return next(err)
+//         }
+//       })
+//     }
+//     return res.sendStatus(200)
+//   })
+// })
 
 // TenttiTaulun SQL-lauseet
 // Yksittäiset SQL-Lauseet
@@ -383,6 +353,54 @@ app.post('/users', (req, res) => {
   });
 })
 
+// Login
+// logiika= tarkista vastaako inputista tullut email ja salasana tietokannassa olevaa
+// sql-lause?: select * from users where email= $1 
+
+app.post('/login', (req, res, next) => {
+
+  const userData = {
+    email: req.body.email,
+    salasana: req.body.salasana,
+  }
+
+  db.query("select * from users where email= $1", [userData.email], (err, result) => {
+    if (err) {
+      return next(err)
+    }
+    const tempUser = result.rows[0]
+    if (tempUser.length === 0) {
+      return res.status(401).json(
+        { error: 'invalid username or password' }
+      )
+    }
+    bcrypt.compare(userData.salasana, tempUser.salasana, function (err, result) {
+      if (result == false) {
+        console.log("salasana väärin")
+        return res.status(401).json(
+          { error: "invalid username or password" }
+        )
+      } else {
+        console.log("salasana oikein")
+        console.log(result)
+        const userForToken = {
+          username: tempUser.email,
+          user_id: tempUser.user_id
+        }
+        const token = jwt.sign(userForToken, 'supersecretbanana')
+
+        console.log(token)
+
+        res
+          .status(200)
+          .send({ token, email: tempUser.email, etunimi: tempUser.etunimi })
+      }
+    })
+  })
+})
+
+//Fileupload
+
 app.post('/upload', function (req, res) {
   /* if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
@@ -406,10 +424,10 @@ app.post('/upload', function (req, res) {
   // console.log("hereweare")
 });
 
-app.get('*',(req,res)=>{
-  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname + '/client/build/index.html'));
 });
 
-httpServer.listen(port,() => {
+httpServer.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
