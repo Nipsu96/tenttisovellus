@@ -1,3 +1,4 @@
+require ('dotenv').config()
 const express = require('express')
 const app = express()
 var jwt = require('jsonwebtoken');
@@ -8,9 +9,11 @@ const cors = require("cors")
 var bodyParser = require("body-parser")
 const db = require('./db')
 const fileUpload = require('express-fileupload')
+const auth = require("./auth")
 module.exports = app
 const httpServer = require('http').createServer(app)
 var port = process.env.PORT || 3005
+
 // const passport = require('passport');
 
 app.use(bodyParser.json())
@@ -92,7 +95,10 @@ io.on('connection', function (socket) {
 
 // TenttiTaulun SQL-lauseet
 // Yksittäiset SQL-Lauseet
-app.get('/tentit', (req, res, next) => {
+
+// middleware 
+
+app.get('/tentit',(req, res, next) => {
   db.query('SELECT * FROM tentti_taulu', (err, result) => {
     if (err) {
       return next(err)
@@ -374,6 +380,8 @@ app.post('/login', (req, res, next) => {
         { error: 'invalid username or password' }
       )
     }
+    console.log(tempUser)
+
     bcrypt.compare(userData.salasana, tempUser.salasana, function (err, result) {
       if (result == false) {
         console.log("salasana väärin")
@@ -387,7 +395,7 @@ app.post('/login', (req, res, next) => {
           username: tempUser.email,
           user_id: tempUser.user_id
         }
-        const token = jwt.sign(userForToken, 'supersecretbanana')
+        const token = jwt.sign(userForToken, process.env.SECRET, {expiresIn: '1d'})
 
         console.log(token)
 

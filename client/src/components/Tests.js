@@ -3,8 +3,7 @@ import '../App.css';
 import AskCard from './AskCard';
 import ShowAnswers from './ShowAnswer';
 
-function Tentit(props)
-{
+function Tentit(props){
 
   const [palautus, setPalautus] = useState(false)
   const [aktiivinenTentti, setAktiivinenTentti] = useState(0)

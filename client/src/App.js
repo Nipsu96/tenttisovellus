@@ -16,19 +16,23 @@ import CloseIcon from '@material-ui/icons/Close';
 import socketIOClient from 'socket.io-client';
 import Login from './components/Login';
 
+
 var path = null
 var endpoint = null
+var client = null
 
 switch (process.env.NODE_ENV) {
   case 'production':
     path = 'https://tenttisovellus-niko.herokuapp.com/'
     endpoint = 'https://tenttisovellus-niko.herokuapp.com'
-    console.log("Heroku",path)
+    client = 'https://tenttisovellus-niko.herokuapp.com/'
+    console.log("Heroku", path)
     break;
   case 'development':
     path = 'http://localhost:3005/'
-    endpoint= 'http://localhost:3005'
-    console.log("Localhost:",path)
+    endpoint = 'http://localhost:3005'
+    client = 'http://localhost:3000/'
+    console.log("Localhost:", path)
     break;
   case 'test':
     path = 'http://localhost:3005/'
@@ -95,9 +99,10 @@ function reducer(state, action) {
 function App(props) {
 
   const [dataAlustettu, setDataAlustettu] = useState(false)
+  const [token, setToken] = useState()
   const [state, dispatch] = useReducer(reducer, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     const socket = socketIOClient(endpoint);
 
     socket.on('connected', function (data) {
@@ -105,16 +110,15 @@ function App(props) {
       socket.emit('ready for data', {});
     });
     socket.on('update', function (data) {
-      console.log("Tietokanta päivitetty!",data.message.payload);
+      console.log("Tietokanta päivitetty!", data.message.payload);
       window.alert("Tietokantaa muokattu!")
     });
-    return ()=> socket.disconnect();
-  },[endpoint])
+    return () => socket.disconnect();
+  }, [endpoint])
 
   useEffect(() => {
 
     const createData = async () => {
-
       try {
         let result = await axios.get(path + "tentit")
         dispatch({ type: "INIT_DATA", data: result.data })
@@ -125,27 +129,51 @@ function App(props) {
     }
 
     const fetchData = async () => {
+      let jemma = window.localStorage;
+      let uusiToken = jemma.getItem("token")
+      setToken(uusiToken)
+      // console.log("Uusitoken",uusiToken)
+      // if (!uusidata) {
+      //   jemma.setItem("data", JSON.stringify(data))
+      //   uusidata = data
+      // } else {
+      //   setToken(JSON.parse(uusidata));
+      // }
+      // fetchData();
+      // //put
+      //   window.localStorage.setItem("data", JSON.stringify(data))
       try {
-        let result = await axios.get(path + "tentit")
+        if (token === null) {
+          console.log("TOkenia ei ole, kirjaudu sisään")
+        } else {
+          console.log("Tämä on:", token)
+          //
+          let result = await axios.get(path + "tentit", {
+            headers: {
+              'authorization': `token ${uusiToken}`
+            }
+          }) //tarkista että token on olemassa! if else lause?
+          console.log("Tämä on result header:", result.headers.authorization)
 
-        if (result.data.length > 0) {
-          for (var i = 0; i < result.data.length; i++) {
-            result.data[i].kyselyt = []
-            let kysymykset = await axios.get(path + "kysymykset/" + result.data[i].tentti_id)
-            result.data[i].kysymykset = kysymykset.data
+          if (result.data.length > 0) {
+            for (var i = 0; i < result.data.length; i++) {
+              result.data[i].kyselyt = []
+              let kysymykset = await axios.get(path + "kysymykset/" + result.data[i].tentti_id)
+              result.data[i].kysymykset = kysymykset.data
 
-            if (result.data[i].kysymykset.length > 0) {
-              for (var j = 0; j < result.data[i].kysymykset.length; j++) {
-                result.data[i].kysymykset[j].vaihtoehdot = []
-                let vaihtoehdot = await axios.get(path + "vastausvaihtoehdot/" + result.data[i].kysymykset[j].kysymys_id)
-                result.data[i].kysymykset[j].vaihtoehdot = vaihtoehdot.data
+              if (result.data[i].kysymykset.length > 0) {
+                for (var j = 0; j < result.data[i].kysymykset.length; j++) {
+                  result.data[i].kysymykset[j].vaihtoehdot = []
+                  let vaihtoehdot = await axios.get(path + "vastausvaihtoehdot/" + result.data[i].kysymykset[j].kysymys_id)
+                  result.data[i].kysymykset[j].vaihtoehdot = vaihtoehdot.data
+                }
               }
             }
+            dispatch({ type: "INIT_DATA", data: result.data })
+            setDataAlustettu(true)
+          } else {
+            throw ("Nyt pitää data kyllä alustaa!")
           }
-          dispatch({ type: "INIT_DATA", data: result.data })
-          setDataAlustettu(true)
-        } else {
-          throw ("Nyt pitää data kyllä alustaa!")
         }
       }
       catch (exception) {
@@ -174,51 +202,70 @@ function App(props) {
   const handleClick = () => setClick(!click);
   const closeMobileMenu = () => setClick(false);
 
+const Logout =()=> {
+    let jemma = window.localStorage;
+    let uusiToken = jemma.removeItem("token")
+    setToken(uusiToken)
+    window.location.href = client
+  }
+
+  const Nav_Bar = () => {
+    if (token === null) {
+      return <ul className={click ? "nav-options active" : "nav-options"}>
+        <li onClick={closeMobileMenu}><Link to="/register"><FormattedMessage id="register"
+        /></Link></li>
+        <li onClick={closeMobileMenu}><Link to="/login"><FormattedMessage id="login"
+        /></Link></li> 
+        </ul>
+    } else {
+      return <ul className={click ? "nav-options active" : "nav-options"}>
+      <li onClick={closeMobileMenu}><Link to="/tests" className="active" ><FormattedMessage id="tests" /></Link></li>
+      <li onClick={closeMobileMenu} ><Link to="/about"><FormattedMessage id="about"
+      /></Link></li>
+      <li onClick={closeMobileMenu}><Link to="/admin"><FormattedMessage id="modify"
+      /></Link></li>
+      <li onClick={Logout}><Link to="/logout"><FormattedMessage id="logout"
+      /></Link></li> 
+      </ul>
+    }
+  }
+  
+
   return (
     <Router>
       <div className="App">
         <header className="App-header">
-          <ul className={click ? "nav-options active" : "nav-options"}>
-            <li onClick={closeMobileMenu}><Link to="/tests" className="active" ><FormattedMessage id="tests" /></Link></li>
-            <li onClick={closeMobileMenu} ><Link to="/about"><FormattedMessage id="about"
-            /></Link></li>
-            <li onClick={closeMobileMenu}><Link to="/admin"><FormattedMessage id="modify"
-            /></Link></li>
-            <li onClick={closeMobileMenu}><Link to="/register"><FormattedMessage id="register"
-            /></Link></li>
-            <li onClick={closeMobileMenu}><Link to="/login"><FormattedMessage id="login"
-            /></Link></li>
-          </ul>
+          <Nav_Bar/>
           <div className="mobile-menu" onClick={handleClick}>
             {click ? (
               <CloseIcon style=
                 {{
                   color: "white",
                   fontSize: 29,
-                  
+
                 }}
                 className="menu-icon" />
             ) : (
                 <MenuIcon style={{
                   color: "white",
                   fontSize: 29,
-                }} 
-                className="menu-icon" />
+                }}
+                  className="menu-icon" />
               )}
           </div>
         </header>
         <Switch>
           <Route path="/tests">
-            {state.length > 0 ? <Tentit path ={path} data={state} dispatch={dispatch} /> : "Tietoa haetaan"}
+            {state.length > 0 ? <Tentit path={path} data={state} dispatch={dispatch} /> : "Tietoa haetaan"}
           </Route>
           <Route path="/admin">
-            {state.length > 0 ? <ChangeTests path ={path} data={state} dispatch={dispatch} /> : "Tietoa haetaan"}
+            {state.length > 0 ? <ChangeTests path={path} data={state} dispatch={dispatch} /> : "Tietoa haetaan"}
           </Route>
           <Route path="/register">
-            {state.length > 0 ? <Register path ={path} /> : "Tietoa haetaan"}
+            <Register path={path} />
           </Route>
           <Route path="/login">
-            {state.length > 0 ? <Login path ={path} /> : "Tietoa haetaan"}
+            <Login path={path} client={client} />
           </Route>
 
         </Switch>

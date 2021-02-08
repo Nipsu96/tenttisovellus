@@ -20,7 +20,7 @@ function Register(props) {
         setUserData({ ...userData, [e.target.name]: e.target.checked })
     }
     const doSubmit = async (e) => {
-        e.preventDefault()
+        // e.preventDefault()
         /*  const user = {
              first_name:firstName,
              last_name: lastName,
@@ -29,7 +29,7 @@ function Register(props) {
          } */
         try {
             await axios.post(props.path+"users", userData)
-            console.log("Rekisteröinti Onnistui!")
+            alert("Rekisteröinti Onnistui!")
         } catch (e) {
             console.log("registration error",e)
         }
@@ -40,16 +40,16 @@ function Register(props) {
             <h2 className="register_title">Rekisteröidy</h2>
             <form onSubmit={e => doSubmit(e)}>
                 <label htmlFor="fname">Etunimi: </label>
-                <input type="text" id="fname" name="etunimi" placeholder="Etunimi" value={userData.etunimi} onChange={onChange}></input><br />
+                <input type="text" id="fname" name="etunimi" placeholder="Etunimi" value={userData.etunimi} onChange={onChange} required></input><br />
                 <label htmlFor="lname">Sukunimi: </label>
                 <input type="text" id="lname" name="sukunimi" placeholder="Sukunimi" value={userData.sukunimi}
-                    onChange={onChange}></input><br />
+                    onChange={onChange} required></input><br />
                 <label htmlFor="email">Sähköposti: </label>
                 <input type="email" id="email" name="email" placeholder="Sähköposti" value={userData.email}
-                    onChange={onChange}></input><br />
-                <label htmlFor="password">Salasana: </label>
+                    onChange={onChange} required></input><br />
+                <label htmlFor="password">Salasana (vähintään 4 merkkiä): </label>
                 <input type="password" id="password" name="salasana" placeholder="Salasana" value={userData.salasana}
-                    onChange={onChange}></input><br />
+                    onChange={onChange} minlength="4" required></input><br />
                 <label htmlFor="isTeacher">Olen opettaja: </label> 
                 <input type="checkbox" id="isTeacher" name="onko_opettaja" value={userData.onko_opettaja}
                     onChange={onChangeCheckbox}></input><br />

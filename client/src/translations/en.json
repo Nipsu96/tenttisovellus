@@ -4,5 +4,6 @@
     "about":"About the App",
     "modify":"Modify/Delete/Add",
     "register":"Register",
-    "login":"Login"
+    "login":"Login",
+    "logout":"Logout"
 }

@@ -15,24 +15,23 @@ function Login(props) {
     }
     const doSubmit = async (e) => {
         e.preventDefault()
-        /*  const user = {
-             first_name:firstName,
-             last_name: lastName,
-             email: email,
-             password: password
-         } */
         try {
-            await axios.post(props.path+"login", userData)
+            let token = null
+            token = await axios.post(props.path + "login", userData)
             console.log("Kirjautuminen onnistui")
+            console.log(token.data.token)
+            window.localStorage.setItem("token", (token.data.token))
+            window.location.href = props.client +"tests"
+
         } catch (e) {
-            console.log("Kirjautuminen epäonnistui",e)
+            console.log("Kirjautuminen epäonnistui", e)
         }
     }
 
     return <div className="main">
         <div className="register">
             <h2 className="register_title">Kirjaudu sisään</h2>
-            <form onSubmit={e => doSubmit(e)}>
+            <form  onSubmit={e => doSubmit(e)}>
                 <label htmlFor="email">Sähköposti: </label>
                 <input type="email" id="email" name="email" placeholder="Sähköposti" value={userData.email}
                     onChange={onChange}></input><br />
